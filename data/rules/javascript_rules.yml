@@ -1,0 +1,56 @@
+# data/rules/javascript_rules.yml
+
+rules:
+  - id: 'JS001'
+    name: '使用 eval() 导致的代码执行'
+    description: '检测对 eval() 的调用，可能导致任意代码执行漏洞。'
+    severity: 'High'
+    patterns:
+      - pattern: 'eval({{code}})'
+    conditions:
+      - tainted: '{{code}}'
+    remediation: '避免使用 eval()，如果需要解析 JSON，使用 JSON.parse()。'
+
+  - id: 'JS002'
+    name: 'DOM XSS 漏洞'
+    description: '检测将用户输入插入到 DOM 中，可能导致跨站脚本（XSS）漏洞。'
+    severity: 'High'
+    patterns:
+      - pattern: '{{element}}.innerHTML = {{input}}'
+      - pattern: '{{element}}.outerHTML = {{input}}'
+      - pattern: 'document.write({{input}})'
+    conditions:
+      - tainted: '{{input}}'
+    remediation: '对输入进行HTML转义，或使用安全的DOM操作方法。'
+
+  - id: 'JS003'
+    name: '命令注入（child_process.exec）'
+    description: '检测对 child_process.exec() 的不安全调用，可能导致命令注入漏洞。'
+    severity: 'High'
+    patterns:
+      - pattern: 'child_process.exec({{command}}, {{*}})'
+    conditions:
+      - tainted: '{{command}}'
+    remediation: '使用 child_process.execFile() 并传递参数数组，避免使用 shell。'
+
+  - id: 'JS004'
+    name: '路径遍历与文件系统访问'
+    description: '检测对文件系统API的不安全使用，可能导致路径遍历漏洞。'
+    severity: 'Medium'
+    patterns:
+      - pattern: 'fs.readFile({{path}}, {{callback}})'
+      - pattern: 'fs.writeFile({{path}}, {{data}}, {{callback}})'
+    conditions:
+      - tainted: '{{path}}'
+    remediation: '对文件路径进行验证，使用路径白名单或限制在特定目录下。'
+
+  - id: 'JS005'
+    name: '禁止使用同步的文件系统API'
+    description: '同步的文件系统操作会阻塞事件循环，影响性能。'
+    severity: 'Low'
+    patterns:
+      - pattern: 'fs.readFileSync({{*}})'
+      - pattern: 'fs.writeFileSync({{*}})'
+    remediation: '使用异步的文件系统API，以避免阻塞事件循环。'
+
+  # 可根据需要添加更多规则

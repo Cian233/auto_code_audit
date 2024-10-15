@@ -1,0 +1,37 @@
+# data/sensitive_functions/javascript.yml
+
+sensitive_functions:
+  - name: 'eval'
+    description: '执行字符串表达式，可能导致代码注入漏洞。'
+    examples:
+      - 'eval(code)'
+  - name: 'Function'
+    description: '构造函数形式的eval，可能导致代码注入漏洞。'
+    examples:
+      - 'new Function(args, code)'
+  - name: 'document.write'
+    description: '动态写入页面内容，可能导致跨站脚本（XSS）漏洞。'
+    examples:
+      - 'document.write(content)'
+  - name: 'innerHTML'
+    description: '设置HTML内容，可能导致XSS漏洞。'
+    examples:
+      - 'element.innerHTML = content'
+  - name: 'XMLHttpRequest'
+    description: '网络请求，可能导致跨域问题。'
+    examples:
+      - 'var xhr = new XMLHttpRequest();'
+  - name: 'fs.readFile'
+    description: '读取文件，可能导致敏感信息泄露。'
+    examples:
+      - 'fs.readFile(path, callback)'
+  - name: 'fs.writeFile'
+    description: '写入文件，可能被滥用篡改文件。'
+    examples:
+      - 'fs.writeFile(path, data, callback)'
+  - name: 'child_process.exec'
+    description: '执行系统命令，可能导致命令注入漏洞。'
+    examples:
+      - 'child_process.exec(command, callback)'
+
+# 可根据需要添加更多敏感函数

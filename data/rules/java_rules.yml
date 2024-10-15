@@ -1,0 +1,54 @@
+# data/rules/java_rules.yml
+
+rules:
+  - id: 'JAVA001'
+    name: '使用 Runtime.exec() 导致的命令注入'
+    description: '检测对 Runtime.exec() 的不安全调用，可能导致命令注入漏洞。'
+    severity: 'High'
+    patterns:
+      - pattern: 'Runtime.getRuntime().exec({{command}})'
+    conditions:
+      - tainted: '{{command}}'
+    remediation: '对命令和参数进行严格的输入验证，或使用 ProcessBuilder 并避免使用 shell 命令。'
+
+  - id: 'JAVA002'
+    name: 'SQL 注入漏洞'
+    description: '检测使用 Statement 执行 SQL 时拼接字符串，可能导致 SQL 注入漏洞。'
+    severity: 'High'
+    patterns:
+      - pattern: 'Statement.executeQuery({{sql}})'
+    conditions:
+      - tainted: '{{sql}}'
+    remediation: '使用 PreparedStatement 和参数化查询，避免直接拼接 SQL 字符串。'
+
+  - id: 'JAVA003'
+    name: '不安全的反序列化（readObject）'
+    description: '检测对 readObject() 的调用，可能导致任意代码执行漏洞。'
+    severity: 'High'
+    patterns:
+      - pattern: 'ObjectInputStream.readObject()'
+    remediation: '避免从不可信来源反序列化对象，或使用安全的序列化机制。'
+
+  - id: 'JAVA004'
+    name: '文件操作中的路径遍历漏洞'
+    description: '检测对文件操作类的不安全使用，可能导致路径遍历漏洞。'
+    severity: 'Medium'
+    patterns:
+      - pattern: 'new FileInputStream({{filename}})'
+      - pattern: 'Files.readAllBytes(Paths.get({{filename}}))'
+    conditions:
+      - tainted: '{{filename}}'
+    remediation: '对文件名进行白名单校验，避免使用用户可控的路径，或使用安全的路径解析方法。'
+
+  - id: 'JAVA005'
+    name: '潜在的 XXE 漏洞'
+    description: '检测 XML 解析器未禁用外部实体的情况下解析 XML，可能导致 XXE 漏洞。'
+    severity: 'High'
+    patterns:
+      - pattern: 'DocumentBuilderFactory.newInstance()'
+    conditions:
+      - not:
+          pattern: '{{factory}}.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true)'
+    remediation: '配置 XML 解析器以禁用外部实体解析。'
+
+  # 可根据需要添加更多规则

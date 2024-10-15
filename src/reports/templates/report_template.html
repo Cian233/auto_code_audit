@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>代码审计报告</title>
+    <style>
+        /* 在这里添加报告的样式 */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1, h2 {
+            color: #2E3A59;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table, th, td {
+            border: 1px solid #CCC;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        .high-risk {
+            background-color: #FFB6C1;
+        }
+        .medium-risk {
+            background-color: #FFFACD;
+        }
+        .low-risk {
+            background-color: #E0FFFF;
+        }
+    </style>
+</head>
+<body>
+    <h1>代码审计报告</h1>
+    <h2>漏洞列表</h2>
+    {% if vulnerabilities %}
+    <table>
+        <thead>
+            <tr>
+                <th>风险等级</th>
+                <th>漏洞类型</th>
+                <th>位置</th>
+                <th>描述</th>
+                <th>修复建议</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for vuln in vulnerabilities %}
+            <tr class="{{ vuln.severity }}-risk">
+                <td>{{ vuln.severity }}</td>
+                <td>{{ vuln.type }}</td>
+                <td>{{ vuln.location }}</td>
+                <td>{{ vuln.description }}</td>
+                <td>{{ vuln.recommendation }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>未发现漏洞。</p>
+    {% endif %}
+    <p>生成时间：{{ now }}</p>
+</body>
+</html>

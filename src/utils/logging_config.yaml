@@ -1,0 +1,29 @@
+# utils/logging_config.yaml
+
+version: 1
+disable_existing_loggers: False
+
+formatters:
+  standard:
+    format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+
+handlers:
+  console:
+    class: logging.StreamHandler
+    level: DEBUG
+    formatter: standard
+    stream: ext://sys.stdout
+
+loggers:
+  # 根日志器
+  '':
+    level: INFO
+    handlers:
+      - console
+
+  # 特定模块的日志器，如需要可以单独配置
+  # 'my_module':
+  #   level: DEBUG
+  #   handlers:
+  #     - console
+  #   propagate: False

@@ -1,0 +1,68 @@
+# data/rules/python_rules.yml
+
+rules:
+  - id: 'PY001'
+    name: '使用 os.system 导致的命令注入'
+    description: '检测对 os.system() 的不安全调用，可能导致命令注入漏洞。'
+    severity: 'High'
+    patterns:
+      - pattern: 'os.system({{input}})'
+    conditions:
+      - tainted: '{{input}}'
+    remediation: '在将用户输入传递给 os.system() 之前进行严格的输入验证和转义，或使用更安全的库方法。'
+
+  - id: 'PY002'
+    name: '使用 eval() 导致的代码执行'
+    description: '检测对 eval() 的调用，可能导致任意代码执行漏洞。'
+    severity: 'High'
+    patterns:
+      - pattern: 'eval({{code}})'
+    conditions:
+      - tainted: '{{code}}'
+    remediation: '避免使用 eval()，如需动态执行代码，使用安全的替代方法。'
+
+  - id: 'PY003'
+    name: '不安全的反序列化（pickle.load）'
+    description: '检测对 pickle.load() 的调用，可能导致任意代码执行漏洞。'
+    severity: 'High'
+    patterns:
+      - pattern: 'pickle.load({{stream}})'
+    conditions:
+      - tainted: '{{stream}}'
+    remediation: '不要从不可信来源加载序列化数据，或使用安全的序列化库。'
+
+  - id: 'PY004'
+    name: '使用 yaml.load 造成的安全问题'
+    description: '检测使用 yaml.load() 而非安全加载器，可能导致安全风险。'
+    severity: 'Medium'
+    patterns:
+      - pattern: 'yaml.load({{stream}})'
+    conditions:
+      - not:
+          pattern: 'yaml.load({{stream}}, Loader=yaml.SafeLoader)'
+    remediation: '使用安全的加载器，如 yaml.safe_load() 或指定 Loader=yaml.SafeLoader。'
+
+  - id: 'PY005'
+    name: '文件操作中的路径遍历漏洞'
+    description: '检测对 open() 等文件操作函数的不安全使用，可能导致路径遍历漏洞。'
+    severity: 'Medium'
+    patterns:
+      - pattern: 'open({{filename}})'
+      - pattern: 'os.open({{filename}}, {{mode}})'
+    conditions:
+      - tainted: '{{filename}}'
+    remediation: '对文件名进行白名单校验，避免使用用户可控的路径，或使用 os.path.abspath() 检查路径。'
+
+  - id: 'PY006'
+    name: '使用 subprocess.Popen 导致的命令注入'
+    description: '检测对 subprocess.Popen() 的不安全调用，可能导致命令注入漏洞。'
+    severity: 'High'
+    patterns:
+      - pattern: 'subprocess.Popen({{args}}, {{*}})'
+    conditions:
+      - tainted: '{{args}}'
+      - or:
+          - not_contains: 'shell=False'
+    remediation: '避免使用 shell=True，且对传递的参数进行输入验证。'
+
+  # 可根据需要添加更多规则
